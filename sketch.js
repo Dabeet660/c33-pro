@@ -2,12 +2,19 @@ var Engine = Matter.Engine,
   World = Matter.World,
   Events = Matter.Events,
   Bodies = Matter.Bodies;
- 
+
+
+var divisions = []; 
 var particles = [];
 var plinkos = [];
 
+var particle;
+
+var gameState = "Play";
+
 var divisionHeight=300;
-var score =0;
+var score = 0;
+var turn = 0;
 function setup() {
   createCanvas(800, 800);
   engine = Engine.create();
@@ -52,28 +59,77 @@ function setup() {
 
 
 function draw() {
-  background("black");
-  textSize(20)
- //text("Score : "+score,20,30);
+  
+  background('Black');
+
+
   Engine.update(engine);
  
+    if(gameState == "Play"){
+      
+      if(frameCount%60===0){
+        particles.push(new Particle(random(width/2-30, width/2+30), 10,10));
+      }
+    
+     for (var j = 0; j < particles.length; j++){
+        particles[j].display();
+      }
   
-   for (var i = 0; i < plinkos.length; i++) {
-     
-     plinkos[i].display();
-     
-   }
-   if(frameCount%60===0){
-     particles.push(new particle(random(width/2-30, width/2+30), 10,10));
-     score++;
-   }
- 
-  for (var j = 0; j < particles.length; j++) {
+     for (var i = 0; i < plinkos.length; i++) {
+       plinkos[i].display();
+     }
    
-     particles[j].display();
-   }
-   for (var k = 0; k < divisions.length; k++) {
+     for (var k = 0; k < divisions.length; k++) {
+       divisions[k].display();
+     }
      
-     divisions[k].display();
+   increaseScore();
+   stroke("Yellow");
+   textSize(20)
+   text("Score : "+score,20,30);
+   line(0,500,800,500);
+
+}
+   
+   if(gameState == "End"){
+    gameOver();
    }
+  
+   
+
+   console.log(turn);
+  
+}
+
+function mousePressed(){
+  gameState = "Play"
+  if(gameState !== "end"){
+     turn++;
+     particle = new Particle(mouseX,10,10,10);
+  }
+}
+
+function increaseScore(){
+  if(particle!=null && gameState == "Play"){
+    particle.display();
+    if(particle.body.position.x < 300){
+      score = score + 500;
+      if(turn >= 5) gameState = "end";
+    }
+    if(particle.body.position.x > 301 && particle.body.position.x < 600){
+      score = score +  100;
+      if(turn >= 5) gameState = "end";
+    }
+    if(particle.body.position.x > 601 && particle.body.position.x < 900){
+      score = score + 200;
+      if(turn>=5) gameState = "end";
+    }
+  }
+}
+
+function gameOver(){
+  if(turn == 5){
+    textSize(20);
+    text("GAME OVER",200,200);
+  }
 }
